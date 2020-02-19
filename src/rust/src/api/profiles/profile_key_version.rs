@@ -8,8 +8,8 @@
 #![allow(non_snake_case)]
 
 use crate::common::simple_types::*;
-use serde::{Serialize, Serializer};
 use serde::ser::SerializeTuple;
+use serde::{Serialize, Serializer};
 
 #[derive(Copy, Clone)]
 pub struct ProfileKeyVersion {
@@ -17,7 +17,6 @@ pub struct ProfileKeyVersion {
 }
 
 impl Serialize for ProfileKeyVersion {
-
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -28,5 +27,4 @@ impl Serialize for ProfileKeyVersion {
         }
         seq.end()
     }
-
 }

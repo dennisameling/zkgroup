@@ -50,7 +50,7 @@ impl SystemParameters {
 }
 
 impl CommitmentWithSecretNonce {
-    pub fn new(profile_key: RistrettoPoint) -> (CommitmentWithSecretNonce) {
+    pub fn new(profile_key: RistrettoPoint) -> CommitmentWithSecretNonce {
         let system = SystemParameters::get_hardcoded();
         let jprime = calculate_scalar(
             b"Signal_ZKGroup_ProfileKey_Commit_jprime",
