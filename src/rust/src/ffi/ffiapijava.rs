@@ -9,6 +9,8 @@
 
 #![allow(non_snake_case)]
 
+use std::panic;
+
 use crate::ffi::constants::*;
 
 extern crate jni;
@@ -46,16 +48,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyGetComm
     profileKey: jbyteArray,
     profileKeyCommitmentOut: jbyteArray,
 ) -> i32 {
-    let profile_key = env.convert_byte_array(profileKey).unwrap();
-    let mut profile_key_commitment: Vec<u8> = vec![0; env.get_array_length(profileKeyCommitmentOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let profile_key = env.convert_byte_array(profileKey).unwrap();
+        let mut profile_key_commitment: Vec<u8> = vec![0; env.get_array_length(profileKeyCommitmentOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ProfileKey_getCommitment(&profile_key,  &mut profile_key_commitment);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKey_getCommitment(&profile_key,  &mut profile_key_commitment);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyCommitmentOut, 0, &u8toi8(profile_key_commitment)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyCommitmentOut, 0, &u8toi8(profile_key_commitment)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -65,16 +74,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyGetProf
     profileKey: jbyteArray,
     profileKeyVersionOut: jbyteArray,
 ) -> i32 {
-    let profile_key = env.convert_byte_array(profileKey).unwrap();
-    let mut profile_key_version: Vec<u8> = vec![0; env.get_array_length(profileKeyVersionOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let profile_key = env.convert_byte_array(profileKey).unwrap();
+        let mut profile_key_version: Vec<u8> = vec![0; env.get_array_length(profileKeyVersionOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ProfileKey_getProfileKeyVersion(&profile_key,  &mut profile_key_version);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKey_getProfileKeyVersion(&profile_key,  &mut profile_key_version);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyVersionOut, 0, &u8toi8(profile_key_version)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyVersionOut, 0, &u8toi8(profile_key_version)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -83,13 +99,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCommitm
     _class: JClass,
     profileKeyCommitment: jbyteArray,
 ) -> i32 {
-    let profile_key_commitment = env.convert_byte_array(profileKeyCommitment).unwrap();
+    let result = panic::catch_unwind(|| {
+        let profile_key_commitment = env.convert_byte_array(profileKeyCommitment).unwrap();
 
-    let ffi_return = simpleapi::ProfileKeyCommitment_checkValidContents(&profile_key_commitment, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCommitment_checkValidContents(&profile_key_commitment, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -99,16 +122,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCommitm
     profileKeyCommitment: jbyteArray,
     profileKeyVersionOut: jbyteArray,
 ) -> i32 {
-    let profile_key_commitment = env.convert_byte_array(profileKeyCommitment).unwrap();
-    let mut profile_key_version: Vec<u8> = vec![0; env.get_array_length(profileKeyVersionOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let profile_key_commitment = env.convert_byte_array(profileKeyCommitment).unwrap();
+        let mut profile_key_version: Vec<u8> = vec![0; env.get_array_length(profileKeyVersionOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ProfileKeyCommitment_getProfileKeyVersion(&profile_key_commitment,  &mut profile_key_version);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCommitment_getProfileKeyVersion(&profile_key_commitment,  &mut profile_key_version);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyVersionOut, 0, &u8toi8(profile_key_version)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyVersionOut, 0, &u8toi8(profile_key_version)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -118,16 +148,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     randomness: jbyteArray,
     groupSecretParamsOut: jbyteArray,
 ) -> i32 {
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let mut group_secret_params: Vec<u8> = vec![0; env.get_array_length(groupSecretParamsOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let mut group_secret_params: Vec<u8> = vec![0; env.get_array_length(groupSecretParamsOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_generateDeterministic(&randomness,  &mut group_secret_params);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_generateDeterministic(&randomness,  &mut group_secret_params);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(groupSecretParamsOut, 0, &u8toi8(group_secret_params)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(groupSecretParamsOut, 0, &u8toi8(group_secret_params)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -137,16 +174,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     groupMasterKey: jbyteArray,
     groupSecretParamsOut: jbyteArray,
 ) -> i32 {
-    let group_master_key = env.convert_byte_array(groupMasterKey).unwrap();
-    let mut group_secret_params: Vec<u8> = vec![0; env.get_array_length(groupSecretParamsOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_master_key = env.convert_byte_array(groupMasterKey).unwrap();
+        let mut group_secret_params: Vec<u8> = vec![0; env.get_array_length(groupSecretParamsOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_deriveFromMasterKey(&group_master_key,  &mut group_secret_params);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_deriveFromMasterKey(&group_master_key,  &mut group_secret_params);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(groupSecretParamsOut, 0, &u8toi8(group_secret_params)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(groupSecretParamsOut, 0, &u8toi8(group_secret_params)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -155,13 +199,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     _class: JClass,
     groupSecretParams: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
 
-    let ffi_return = simpleapi::GroupSecretParams_checkValidContents(&group_secret_params, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_checkValidContents(&group_secret_params, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -171,16 +222,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     groupSecretParams: jbyteArray,
     groupMasterKeyOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let mut group_master_key: Vec<u8> = vec![0; env.get_array_length(groupMasterKeyOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let mut group_master_key: Vec<u8> = vec![0; env.get_array_length(groupMasterKeyOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_getMasterKey(&group_secret_params,  &mut group_master_key);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_getMasterKey(&group_secret_params,  &mut group_master_key);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(groupMasterKeyOut, 0, &u8toi8(group_master_key)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(groupMasterKeyOut, 0, &u8toi8(group_master_key)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -190,16 +248,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     groupSecretParams: jbyteArray,
     groupPublicParamsOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let mut group_public_params: Vec<u8> = vec![0; env.get_array_length(groupPublicParamsOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let mut group_public_params: Vec<u8> = vec![0; env.get_array_length(groupPublicParamsOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_getPublicParams(&group_secret_params,  &mut group_public_params);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_getPublicParams(&group_secret_params,  &mut group_public_params);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(groupPublicParamsOut, 0, &u8toi8(group_public_params)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(groupPublicParamsOut, 0, &u8toi8(group_public_params)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -211,18 +276,25 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     message: jbyteArray,
     changeSignatureOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let message = env.convert_byte_array(message).unwrap();
-    let mut change_signature: Vec<u8> = vec![0; env.get_array_length(changeSignatureOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let message = env.convert_byte_array(message).unwrap();
+        let mut change_signature: Vec<u8> = vec![0; env.get_array_length(changeSignatureOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_signDeterministic(&group_secret_params, &randomness, &message,  &mut change_signature);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_signDeterministic(&group_secret_params, &randomness, &message,  &mut change_signature);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(changeSignatureOut, 0, &u8toi8(change_signature)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(changeSignatureOut, 0, &u8toi8(change_signature)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -233,17 +305,24 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     uuid: jbyteArray,
     uuidCiphertextOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let uuid = env.convert_byte_array(uuid).unwrap();
-    let mut uuid_ciphertext: Vec<u8> = vec![0; env.get_array_length(uuidCiphertextOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let uuid = env.convert_byte_array(uuid).unwrap();
+        let mut uuid_ciphertext: Vec<u8> = vec![0; env.get_array_length(uuidCiphertextOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_encryptUuid(&group_secret_params, &uuid,  &mut uuid_ciphertext);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_encryptUuid(&group_secret_params, &uuid,  &mut uuid_ciphertext);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(uuidCiphertextOut, 0, &u8toi8(uuid_ciphertext)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(uuidCiphertextOut, 0, &u8toi8(uuid_ciphertext)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -254,17 +333,24 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     uuidCiphertext: jbyteArray,
     uuidOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let uuid_ciphertext = env.convert_byte_array(uuidCiphertext).unwrap();
-    let mut uuid: Vec<u8> = vec![0; env.get_array_length(uuidOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let uuid_ciphertext = env.convert_byte_array(uuidCiphertext).unwrap();
+        let mut uuid: Vec<u8> = vec![0; env.get_array_length(uuidOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_decryptUuid(&group_secret_params, &uuid_ciphertext,  &mut uuid);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_decryptUuid(&group_secret_params, &uuid_ciphertext,  &mut uuid);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(uuidOut, 0, &u8toi8(uuid)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(uuidOut, 0, &u8toi8(uuid)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -276,18 +362,25 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     profileKey: jbyteArray,
     profileKeyCiphertextOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let profile_key = env.convert_byte_array(profileKey).unwrap();
-    let mut profile_key_ciphertext: Vec<u8> = vec![0; env.get_array_length(profileKeyCiphertextOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let profile_key = env.convert_byte_array(profileKey).unwrap();
+        let mut profile_key_ciphertext: Vec<u8> = vec![0; env.get_array_length(profileKeyCiphertextOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_encryptProfileKeyDeterministic(&group_secret_params, &randomness, &profile_key,  &mut profile_key_ciphertext);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_encryptProfileKeyDeterministic(&group_secret_params, &randomness, &profile_key,  &mut profile_key_ciphertext);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyCiphertextOut, 0, &u8toi8(profile_key_ciphertext)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyCiphertextOut, 0, &u8toi8(profile_key_ciphertext)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -298,17 +391,24 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     profileKeyCiphertext: jbyteArray,
     profileKeyOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let profile_key_ciphertext = env.convert_byte_array(profileKeyCiphertext).unwrap();
-    let mut profile_key: Vec<u8> = vec![0; env.get_array_length(profileKeyOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let profile_key_ciphertext = env.convert_byte_array(profileKeyCiphertext).unwrap();
+        let mut profile_key: Vec<u8> = vec![0; env.get_array_length(profileKeyOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_decryptProfileKey(&group_secret_params, &profile_key_ciphertext,  &mut profile_key);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_decryptProfileKey(&group_secret_params, &profile_key_ciphertext,  &mut profile_key);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyOut, 0, &u8toi8(profile_key)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyOut, 0, &u8toi8(profile_key)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -319,17 +419,24 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     plaintext: jbyteArray,
     blobCiphertextOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let plaintext = env.convert_byte_array(plaintext).unwrap();
-    let mut blob_ciphertext: Vec<u8> = vec![0; env.get_array_length(blobCiphertextOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let plaintext = env.convert_byte_array(plaintext).unwrap();
+        let mut blob_ciphertext: Vec<u8> = vec![0; env.get_array_length(blobCiphertextOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_encryptBlob(&group_secret_params, &plaintext,  &mut blob_ciphertext);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_encryptBlob(&group_secret_params, &plaintext,  &mut blob_ciphertext);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(blobCiphertextOut, 0, &u8toi8(blob_ciphertext)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(blobCiphertextOut, 0, &u8toi8(blob_ciphertext)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -340,17 +447,24 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
     blobCiphertext: jbyteArray,
     plaintextOut: jbyteArray,
 ) -> i32 {
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let blob_ciphertext = env.convert_byte_array(blobCiphertext).unwrap();
-    let mut plaintext: Vec<u8> = vec![0; env.get_array_length(plaintextOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let blob_ciphertext = env.convert_byte_array(blobCiphertext).unwrap();
+        let mut plaintext: Vec<u8> = vec![0; env.get_array_length(plaintextOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupSecretParams_decryptBlob(&group_secret_params, &blob_ciphertext,  &mut plaintext);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupSecretParams_decryptBlob(&group_secret_params, &blob_ciphertext,  &mut plaintext);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(plaintextOut, 0, &u8toi8(plaintext)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(plaintextOut, 0, &u8toi8(plaintext)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -360,16 +474,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverSecretParam
     randomness: jbyteArray,
     serverSecretParamsOut: jbyteArray,
 ) -> i32 {
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let mut server_secret_params: Vec<u8> = vec![0; env.get_array_length(serverSecretParamsOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let mut server_secret_params: Vec<u8> = vec![0; env.get_array_length(serverSecretParamsOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerSecretParams_generateDeterministic(&randomness,  &mut server_secret_params);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerSecretParams_generateDeterministic(&randomness,  &mut server_secret_params);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(serverSecretParamsOut, 0, &u8toi8(server_secret_params)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(serverSecretParamsOut, 0, &u8toi8(server_secret_params)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -378,13 +499,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverSecretParam
     _class: JClass,
     serverSecretParams: jbyteArray,
 ) -> i32 {
-    let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
+    let result = panic::catch_unwind(|| {
+        let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
 
-    let ffi_return = simpleapi::ServerSecretParams_checkValidContents(&server_secret_params, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerSecretParams_checkValidContents(&server_secret_params, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -394,16 +522,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverSecretParam
     serverSecretParams: jbyteArray,
     serverPublicParamsOut: jbyteArray,
 ) -> i32 {
-    let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
-    let mut server_public_params: Vec<u8> = vec![0; env.get_array_length(serverPublicParamsOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
+        let mut server_public_params: Vec<u8> = vec![0; env.get_array_length(serverPublicParamsOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerSecretParams_getPublicParams(&server_secret_params,  &mut server_public_params);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerSecretParams_getPublicParams(&server_secret_params,  &mut server_public_params);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(serverPublicParamsOut, 0, &u8toi8(server_public_params)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(serverPublicParamsOut, 0, &u8toi8(server_public_params)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -415,18 +550,25 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverSecretParam
     message: jbyteArray,
     notarySignatureOut: jbyteArray,
 ) -> i32 {
-    let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let message = env.convert_byte_array(message).unwrap();
-    let mut notary_signature: Vec<u8> = vec![0; env.get_array_length(notarySignatureOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let message = env.convert_byte_array(message).unwrap();
+        let mut notary_signature: Vec<u8> = vec![0; env.get_array_length(notarySignatureOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerSecretParams_signDeterministic(&server_secret_params, &randomness, &message,  &mut notary_signature);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerSecretParams_signDeterministic(&server_secret_params, &randomness, &message,  &mut notary_signature);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(notarySignatureOut, 0, &u8toi8(notary_signature)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(notarySignatureOut, 0, &u8toi8(notary_signature)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -439,19 +581,26 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverPublicParam
     authCredentialResponse: jbyteArray,
     authCredentialOut: jbyteArray,
 ) -> i32 {
-    let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
-    let uuid = env.convert_byte_array(uuid).unwrap();
-    let redemption_time = redemptionTime as u32;
-    let auth_credential_response = env.convert_byte_array(authCredentialResponse).unwrap();
-    let mut auth_credential: Vec<u8> = vec![0; env.get_array_length(authCredentialOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
+        let uuid = env.convert_byte_array(uuid).unwrap();
+        let redemption_time = redemptionTime as u32;
+        let auth_credential_response = env.convert_byte_array(authCredentialResponse).unwrap();
+        let mut auth_credential: Vec<u8> = vec![0; env.get_array_length(authCredentialOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerPublicParams_receiveAuthCredential(&server_public_params, &uuid, redemption_time, &auth_credential_response,  &mut auth_credential);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerPublicParams_receiveAuthCredential(&server_public_params, &uuid, redemption_time, &auth_credential_response,  &mut auth_credential);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(authCredentialOut, 0, &u8toi8(auth_credential)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(authCredentialOut, 0, &u8toi8(auth_credential)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -464,19 +613,26 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverPublicParam
     authCredential: jbyteArray,
     authCredentialPresentationOut: jbyteArray,
 ) -> i32 {
-    let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let auth_credential = env.convert_byte_array(authCredential).unwrap();
-    let mut auth_credential_presentation: Vec<u8> = vec![0; env.get_array_length(authCredentialPresentationOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let auth_credential = env.convert_byte_array(authCredential).unwrap();
+        let mut auth_credential_presentation: Vec<u8> = vec![0; env.get_array_length(authCredentialPresentationOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerPublicParams_createAuthCredentialPresentationDeterministic(&server_public_params, &randomness, &group_secret_params, &auth_credential,  &mut auth_credential_presentation);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerPublicParams_createAuthCredentialPresentationDeterministic(&server_public_params, &randomness, &group_secret_params, &auth_credential,  &mut auth_credential_presentation);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(authCredentialPresentationOut, 0, &u8toi8(auth_credential_presentation)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(authCredentialPresentationOut, 0, &u8toi8(auth_credential_presentation)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -489,19 +645,26 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverPublicParam
     profileKey: jbyteArray,
     profileKeyCredentialRequestContextOut: jbyteArray,
 ) -> i32 {
-    let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let uuid = env.convert_byte_array(uuid).unwrap();
-    let profile_key = env.convert_byte_array(profileKey).unwrap();
-    let mut profile_key_credential_request_context: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialRequestContextOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let uuid = env.convert_byte_array(uuid).unwrap();
+        let profile_key = env.convert_byte_array(profileKey).unwrap();
+        let mut profile_key_credential_request_context: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialRequestContextOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerPublicParams_createProfileKeyCredentialRequestContextDeterministic(&server_public_params, &randomness, &uuid, &profile_key,  &mut profile_key_credential_request_context);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerPublicParams_createProfileKeyCredentialRequestContextDeterministic(&server_public_params, &randomness, &uuid, &profile_key,  &mut profile_key_credential_request_context);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyCredentialRequestContextOut, 0, &u8toi8(profile_key_credential_request_context)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyCredentialRequestContextOut, 0, &u8toi8(profile_key_credential_request_context)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -513,18 +676,25 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverPublicParam
     profileKeyCredentialResponse: jbyteArray,
     profileKeyCredentialOut: jbyteArray,
 ) -> i32 {
-    let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
-    let profile_key_credential_request_context = env.convert_byte_array(profileKeyCredentialRequestContext).unwrap();
-    let profile_key_credential_response = env.convert_byte_array(profileKeyCredentialResponse).unwrap();
-    let mut profile_key_credential: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
+        let profile_key_credential_request_context = env.convert_byte_array(profileKeyCredentialRequestContext).unwrap();
+        let profile_key_credential_response = env.convert_byte_array(profileKeyCredentialResponse).unwrap();
+        let mut profile_key_credential: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerPublicParams_receiveProfileKeyCredential(&server_public_params, &profile_key_credential_request_context, &profile_key_credential_response,  &mut profile_key_credential);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerPublicParams_receiveProfileKeyCredential(&server_public_params, &profile_key_credential_request_context, &profile_key_credential_response,  &mut profile_key_credential);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyCredentialOut, 0, &u8toi8(profile_key_credential)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyCredentialOut, 0, &u8toi8(profile_key_credential)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -537,19 +707,26 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverPublicParam
     profileKeyCredential: jbyteArray,
     profileKeyCredentialPresentationOut: jbyteArray,
 ) -> i32 {
-    let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-    let profile_key_credential = env.convert_byte_array(profileKeyCredential).unwrap();
-    let mut profile_key_credential_presentation: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialPresentationOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
+        let profile_key_credential = env.convert_byte_array(profileKeyCredential).unwrap();
+        let mut profile_key_credential_presentation: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialPresentationOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerPublicParams_createProfileKeyCredentialPresentationDeterministic(&server_public_params, &randomness, &group_secret_params, &profile_key_credential,  &mut profile_key_credential_presentation);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerPublicParams_createProfileKeyCredentialPresentationDeterministic(&server_public_params, &randomness, &group_secret_params, &profile_key_credential,  &mut profile_key_credential_presentation);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyCredentialPresentationOut, 0, &u8toi8(profile_key_credential_presentation)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyCredentialPresentationOut, 0, &u8toi8(profile_key_credential_presentation)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -562,19 +739,26 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverSecretParam
     redemptionTime: jint,
     authCredentialResponseOut: jbyteArray,
 ) -> i32 {
-    let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let uuid = env.convert_byte_array(uuid).unwrap();
-    let redemption_time = redemptionTime as u32;
-    let mut auth_credential_response: Vec<u8> = vec![0; env.get_array_length(authCredentialResponseOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let uuid = env.convert_byte_array(uuid).unwrap();
+        let redemption_time = redemptionTime as u32;
+        let mut auth_credential_response: Vec<u8> = vec![0; env.get_array_length(authCredentialResponseOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerSecretParams_issueAuthCredentialDeterministic(&server_secret_params, &randomness, &uuid, redemption_time,  &mut auth_credential_response);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerSecretParams_issueAuthCredentialDeterministic(&server_secret_params, &randomness, &uuid, redemption_time,  &mut auth_credential_response);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(authCredentialResponseOut, 0, &u8toi8(auth_credential_response)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(authCredentialResponseOut, 0, &u8toi8(auth_credential_response)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -585,15 +769,22 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverSecretParam
     groupPublicParams: jbyteArray,
     authCredentialPresentation: jbyteArray,
 ) -> i32 {
-    let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
-    let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
-    let auth_credential_presentation = env.convert_byte_array(authCredentialPresentation).unwrap();
+    let result = panic::catch_unwind(|| {
+        let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
+        let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
+        let auth_credential_presentation = env.convert_byte_array(authCredentialPresentation).unwrap();
 
-    let ffi_return = simpleapi::ServerSecretParams_verifyAuthCredentialPresentation(&server_secret_params, &group_public_params, &auth_credential_presentation);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerSecretParams_verifyAuthCredentialPresentation(&server_secret_params, &group_public_params, &auth_credential_presentation);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -607,20 +798,27 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverSecretParam
     profileKeyCommitment: jbyteArray,
     profileKeyCredentialResponseOut: jbyteArray,
 ) -> i32 {
-    let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
-    let randomness = env.convert_byte_array(randomness).unwrap();
-    let profile_key_credential_request = env.convert_byte_array(profileKeyCredentialRequest).unwrap();
-    let uuid = env.convert_byte_array(uuid).unwrap();
-    let profile_key_commitment = env.convert_byte_array(profileKeyCommitment).unwrap();
-    let mut profile_key_credential_response: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialResponseOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
+        let randomness = env.convert_byte_array(randomness).unwrap();
+        let profile_key_credential_request = env.convert_byte_array(profileKeyCredentialRequest).unwrap();
+        let uuid = env.convert_byte_array(uuid).unwrap();
+        let profile_key_commitment = env.convert_byte_array(profileKeyCommitment).unwrap();
+        let mut profile_key_credential_response: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialResponseOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ServerSecretParams_issueProfileKeyCredentialDeterministic(&server_secret_params, &randomness, &profile_key_credential_request, &uuid, &profile_key_commitment,  &mut profile_key_credential_response);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerSecretParams_issueProfileKeyCredentialDeterministic(&server_secret_params, &randomness, &profile_key_credential_request, &uuid, &profile_key_commitment,  &mut profile_key_credential_response);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyCredentialResponseOut, 0, &u8toi8(profile_key_credential_response)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyCredentialResponseOut, 0, &u8toi8(profile_key_credential_response)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -631,15 +829,22 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverSecretParam
     groupPublicParams: jbyteArray,
     profileKeyCredentialPresentation: jbyteArray,
 ) -> i32 {
-    let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
-    let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
-    let profile_key_credential_presentation = env.convert_byte_array(profileKeyCredentialPresentation).unwrap();
+    let result = panic::catch_unwind(|| {
+        let server_secret_params = env.convert_byte_array(serverSecretParams).unwrap();
+        let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
+        let profile_key_credential_presentation = env.convert_byte_array(profileKeyCredentialPresentation).unwrap();
 
-    let ffi_return = simpleapi::ServerSecretParams_verifyProfileKeyCredentialPresentation(&server_secret_params, &group_public_params, &profile_key_credential_presentation);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerSecretParams_verifyProfileKeyCredentialPresentation(&server_secret_params, &group_public_params, &profile_key_credential_presentation);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -648,13 +853,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupPublicParams
     _class: JClass,
     groupPublicParams: jbyteArray,
 ) -> i32 {
-    let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
+    let result = panic::catch_unwind(|| {
+        let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
 
-    let ffi_return = simpleapi::GroupPublicParams_checkValidContents(&group_public_params, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupPublicParams_checkValidContents(&group_public_params, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -664,16 +876,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupPublicParams
     groupPublicParams: jbyteArray,
     groupIdentifierOut: jbyteArray,
 ) -> i32 {
-    let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
-    let mut group_identifier: Vec<u8> = vec![0; env.get_array_length(groupIdentifierOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
+        let mut group_identifier: Vec<u8> = vec![0; env.get_array_length(groupIdentifierOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::GroupPublicParams_getGroupIdentifier(&group_public_params,  &mut group_identifier);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupPublicParams_getGroupIdentifier(&group_public_params,  &mut group_identifier);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(groupIdentifierOut, 0, &u8toi8(group_identifier)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(groupIdentifierOut, 0, &u8toi8(group_identifier)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -684,15 +903,22 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupPublicParams
     message: jbyteArray,
     changeSignature: jbyteArray,
 ) -> i32 {
-    let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
-    let message = env.convert_byte_array(message).unwrap();
-    let change_signature = env.convert_byte_array(changeSignature).unwrap();
+    let result = panic::catch_unwind(|| {
+        let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
+        let message = env.convert_byte_array(message).unwrap();
+        let change_signature = env.convert_byte_array(changeSignature).unwrap();
 
-    let ffi_return = simpleapi::GroupPublicParams_verifySignature(&group_public_params, &message, &change_signature);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::GroupPublicParams_verifySignature(&group_public_params, &message, &change_signature);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -701,13 +927,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverPublicParam
     _class: JClass,
     serverPublicParams: jbyteArray,
 ) -> i32 {
-    let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
+    let result = panic::catch_unwind(|| {
+        let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
 
-    let ffi_return = simpleapi::ServerPublicParams_checkValidContents(&server_public_params, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerPublicParams_checkValidContents(&server_public_params, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -718,15 +951,22 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_serverPublicParam
     message: jbyteArray,
     notarySignature: jbyteArray,
 ) -> i32 {
-    let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
-    let message = env.convert_byte_array(message).unwrap();
-    let notary_signature = env.convert_byte_array(notarySignature).unwrap();
+    let result = panic::catch_unwind(|| {
+        let server_public_params = env.convert_byte_array(serverPublicParams).unwrap();
+        let message = env.convert_byte_array(message).unwrap();
+        let notary_signature = env.convert_byte_array(notarySignature).unwrap();
 
-    let ffi_return = simpleapi::ServerPublicParams_verifySignature(&server_public_params, &message, &notary_signature);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ServerPublicParams_verifySignature(&server_public_params, &message, &notary_signature);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -735,13 +975,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_authCredentialRes
     _class: JClass,
     authCredentialResponse: jbyteArray,
 ) -> i32 {
-    let auth_credential_response = env.convert_byte_array(authCredentialResponse).unwrap();
+    let result = panic::catch_unwind(|| {
+        let auth_credential_response = env.convert_byte_array(authCredentialResponse).unwrap();
 
-    let ffi_return = simpleapi::AuthCredentialResponse_checkValidContents(&auth_credential_response, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::AuthCredentialResponse_checkValidContents(&auth_credential_response, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -750,13 +997,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_authCredentialChe
     _class: JClass,
     authCredential: jbyteArray,
 ) -> i32 {
-    let auth_credential = env.convert_byte_array(authCredential).unwrap();
+    let result = panic::catch_unwind(|| {
+        let auth_credential = env.convert_byte_array(authCredential).unwrap();
 
-    let ffi_return = simpleapi::AuthCredential_checkValidContents(&auth_credential, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::AuthCredential_checkValidContents(&auth_credential, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -765,13 +1019,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_authCredentialPre
     _class: JClass,
     authCredentialPresentation: jbyteArray,
 ) -> i32 {
-    let auth_credential_presentation = env.convert_byte_array(authCredentialPresentation).unwrap();
+    let result = panic::catch_unwind(|| {
+        let auth_credential_presentation = env.convert_byte_array(authCredentialPresentation).unwrap();
 
-    let ffi_return = simpleapi::AuthCredentialPresentation_checkValidContents(&auth_credential_presentation, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::AuthCredentialPresentation_checkValidContents(&auth_credential_presentation, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -781,16 +1042,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_authCredentialPre
     authCredentialPresentation: jbyteArray,
     uuidCiphertextOut: jbyteArray,
 ) -> i32 {
-    let auth_credential_presentation = env.convert_byte_array(authCredentialPresentation).unwrap();
-    let mut uuid_ciphertext: Vec<u8> = vec![0; env.get_array_length(uuidCiphertextOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let auth_credential_presentation = env.convert_byte_array(authCredentialPresentation).unwrap();
+        let mut uuid_ciphertext: Vec<u8> = vec![0; env.get_array_length(uuidCiphertextOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::AuthCredentialPresentation_getUuidCiphertext(&auth_credential_presentation,  &mut uuid_ciphertext);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::AuthCredentialPresentation_getUuidCiphertext(&auth_credential_presentation,  &mut uuid_ciphertext);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(uuidCiphertextOut, 0, &u8toi8(uuid_ciphertext)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(uuidCiphertextOut, 0, &u8toi8(uuid_ciphertext)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -800,16 +1068,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_authCredentialPre
     authCredentialPresentation: jbyteArray,
     redemptionTimeOut: jbyteArray,
 ) -> i32 {
-    let auth_credential_presentation = env.convert_byte_array(authCredentialPresentation).unwrap();
-    let mut redemption_time: Vec<u8> = vec![0; env.get_array_length(redemptionTimeOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let auth_credential_presentation = env.convert_byte_array(authCredentialPresentation).unwrap();
+        let mut redemption_time: Vec<u8> = vec![0; env.get_array_length(redemptionTimeOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::AuthCredentialPresentation_getRedemptionTime(&auth_credential_presentation,  &mut redemption_time);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::AuthCredentialPresentation_getRedemptionTime(&auth_credential_presentation,  &mut redemption_time);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(redemptionTimeOut, 0, &u8toi8(redemption_time)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(redemptionTimeOut, 0, &u8toi8(redemption_time)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -818,13 +1093,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCredent
     _class: JClass,
     profileKeyCredentialRequestContext: jbyteArray,
 ) -> i32 {
-    let profile_key_credential_request_context = env.convert_byte_array(profileKeyCredentialRequestContext).unwrap();
+    let result = panic::catch_unwind(|| {
+        let profile_key_credential_request_context = env.convert_byte_array(profileKeyCredentialRequestContext).unwrap();
 
-    let ffi_return = simpleapi::ProfileKeyCredentialRequestContext_checkValidContents(&profile_key_credential_request_context, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCredentialRequestContext_checkValidContents(&profile_key_credential_request_context, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -834,16 +1116,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCredent
     profileKeyCredentialRequestContext: jbyteArray,
     profileKeyCredentialRequestOut: jbyteArray,
 ) -> i32 {
-    let profile_key_credential_request_context = env.convert_byte_array(profileKeyCredentialRequestContext).unwrap();
-    let mut profile_key_credential_request: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialRequestOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let profile_key_credential_request_context = env.convert_byte_array(profileKeyCredentialRequestContext).unwrap();
+        let mut profile_key_credential_request: Vec<u8> = vec![0; env.get_array_length(profileKeyCredentialRequestOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ProfileKeyCredentialRequestContext_getRequest(&profile_key_credential_request_context,  &mut profile_key_credential_request);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCredentialRequestContext_getRequest(&profile_key_credential_request_context,  &mut profile_key_credential_request);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyCredentialRequestOut, 0, &u8toi8(profile_key_credential_request)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyCredentialRequestOut, 0, &u8toi8(profile_key_credential_request)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -852,13 +1141,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCredent
     _class: JClass,
     profileKeyCredentialRequest: jbyteArray,
 ) -> i32 {
-    let profile_key_credential_request = env.convert_byte_array(profileKeyCredentialRequest).unwrap();
+    let result = panic::catch_unwind(|| {
+        let profile_key_credential_request = env.convert_byte_array(profileKeyCredentialRequest).unwrap();
 
-    let ffi_return = simpleapi::ProfileKeyCredentialRequest_checkValidContents(&profile_key_credential_request, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCredentialRequest_checkValidContents(&profile_key_credential_request, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -867,13 +1163,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCredent
     _class: JClass,
     profileKeyCredentialResponse: jbyteArray,
 ) -> i32 {
-    let profile_key_credential_response = env.convert_byte_array(profileKeyCredentialResponse).unwrap();
+    let result = panic::catch_unwind(|| {
+        let profile_key_credential_response = env.convert_byte_array(profileKeyCredentialResponse).unwrap();
 
-    let ffi_return = simpleapi::ProfileKeyCredentialResponse_checkValidContents(&profile_key_credential_response, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCredentialResponse_checkValidContents(&profile_key_credential_response, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -882,13 +1185,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCredent
     _class: JClass,
     profileKeyCredential: jbyteArray,
 ) -> i32 {
-    let profile_key_credential = env.convert_byte_array(profileKeyCredential).unwrap();
+    let result = panic::catch_unwind(|| {
+        let profile_key_credential = env.convert_byte_array(profileKeyCredential).unwrap();
 
-    let ffi_return = simpleapi::ProfileKeyCredential_checkValidContents(&profile_key_credential, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCredential_checkValidContents(&profile_key_credential, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -897,13 +1207,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCredent
     _class: JClass,
     profileKeyCredentialPresentation: jbyteArray,
 ) -> i32 {
-    let profile_key_credential_presentation = env.convert_byte_array(profileKeyCredentialPresentation).unwrap();
+    let result = panic::catch_unwind(|| {
+        let profile_key_credential_presentation = env.convert_byte_array(profileKeyCredentialPresentation).unwrap();
 
-    let ffi_return = simpleapi::ProfileKeyCredentialPresentation_checkValidContents(&profile_key_credential_presentation, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCredentialPresentation_checkValidContents(&profile_key_credential_presentation, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -913,16 +1230,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCredent
     profileKeyCredentialPresentation: jbyteArray,
     uuidCiphertextOut: jbyteArray,
 ) -> i32 {
-    let profile_key_credential_presentation = env.convert_byte_array(profileKeyCredentialPresentation).unwrap();
-    let mut uuid_ciphertext: Vec<u8> = vec![0; env.get_array_length(uuidCiphertextOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let profile_key_credential_presentation = env.convert_byte_array(profileKeyCredentialPresentation).unwrap();
+        let mut uuid_ciphertext: Vec<u8> = vec![0; env.get_array_length(uuidCiphertextOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ProfileKeyCredentialPresentation_getUuidCiphertext(&profile_key_credential_presentation,  &mut uuid_ciphertext);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCredentialPresentation_getUuidCiphertext(&profile_key_credential_presentation,  &mut uuid_ciphertext);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(uuidCiphertextOut, 0, &u8toi8(uuid_ciphertext)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(uuidCiphertextOut, 0, &u8toi8(uuid_ciphertext)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -932,16 +1256,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCredent
     profileKeyCredentialPresentation: jbyteArray,
     profileKeyCiphertextOut: jbyteArray,
 ) -> i32 {
-    let profile_key_credential_presentation = env.convert_byte_array(profileKeyCredentialPresentation).unwrap();
-    let mut profile_key_ciphertext: Vec<u8> = vec![0; env.get_array_length(profileKeyCiphertextOut).unwrap() as usize];
+    let result = panic::catch_unwind(|| {
+        let profile_key_credential_presentation = env.convert_byte_array(profileKeyCredentialPresentation).unwrap();
+        let mut profile_key_ciphertext: Vec<u8> = vec![0; env.get_array_length(profileKeyCiphertextOut).unwrap() as usize];
 
-    let ffi_return = simpleapi::ProfileKeyCredentialPresentation_getProfileKeyCiphertext(&profile_key_credential_presentation,  &mut profile_key_ciphertext);
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCredentialPresentation_getProfileKeyCiphertext(&profile_key_credential_presentation,  &mut profile_key_ciphertext);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(profileKeyCiphertextOut, 0, &u8toi8(profile_key_ciphertext)[..]).unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-
-    env.set_byte_array_region(profileKeyCiphertextOut, 0, &u8toi8(profile_key_ciphertext)[..]).unwrap();
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -950,13 +1281,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_uuidCiphertextChe
     _class: JClass,
     uuidCiphertext: jbyteArray,
 ) -> i32 {
-    let uuid_ciphertext = env.convert_byte_array(uuidCiphertext).unwrap();
+    let result = panic::catch_unwind(|| {
+        let uuid_ciphertext = env.convert_byte_array(uuidCiphertext).unwrap();
 
-    let ffi_return = simpleapi::UuidCiphertext_checkValidContents(&uuid_ciphertext, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::UuidCiphertext_checkValidContents(&uuid_ciphertext, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -965,13 +1303,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCiphert
     _class: JClass,
     profileKeyCiphertext: jbyteArray,
 ) -> i32 {
-    let profile_key_ciphertext = env.convert_byte_array(profileKeyCiphertext).unwrap();
+    let result = panic::catch_unwind(|| {
+        let profile_key_ciphertext = env.convert_byte_array(profileKeyCiphertext).unwrap();
 
-    let ffi_return = simpleapi::ProfileKeyCiphertext_checkValidContents(&profile_key_ciphertext, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::ProfileKeyCiphertext_checkValidContents(&profile_key_ciphertext, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -980,13 +1325,20 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_randomnessCheckVa
     _class: JClass,
     randomness: jbyteArray,
 ) -> i32 {
-    let randomness = env.convert_byte_array(randomness).unwrap();
+    let result = panic::catch_unwind(|| {
+        let randomness = env.convert_byte_array(randomness).unwrap();
 
-    let ffi_return = simpleapi::Randomness_checkValidContents(&randomness, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::Randomness_checkValidContents(&randomness, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
 
 #[no_mangle]
@@ -995,11 +1347,18 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_uuidCheckValidCon
     _class: JClass,
     uuid: jbyteArray,
 ) -> i32 {
-    let uuid = env.convert_byte_array(uuid).unwrap();
+    let result = panic::catch_unwind(|| {
+        let uuid = env.convert_byte_array(uuid).unwrap();
 
-    let ffi_return = simpleapi::Uuid_checkValidContents(&uuid, );
-    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;
+        let ffi_return = simpleapi::Uuid_checkValidContents(&uuid, );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
-    FFI_RETURN_OK
 }
