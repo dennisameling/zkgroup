@@ -12,6 +12,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct ProfileKeyCredentialResponse {
-    pub(crate) blinded_credential: crypto::credentials::BlindedProfileCredential,
-    pub(crate) proof: crypto::proofs::ProfileCredentialIssuanceProof,
+    pub(crate) blinded_credential: crypto::credentials::BlindedProfileKeyCredential,
+    pub(crate) proof: crypto::proofs::ProfileKeyCredentialIssuanceProof,
 }

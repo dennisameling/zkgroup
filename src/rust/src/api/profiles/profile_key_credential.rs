@@ -9,13 +9,11 @@
 
 use crate::common::simple_types::*;
 use crate::crypto;
-use curve25519_dalek::ristretto::RistrettoPoint;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct ProfileKeyCredential {
-    pub(crate) credential: crypto::credentials::ProfileCredential,
+    pub(crate) credential: crypto::credentials::ProfileKeyCredential,
     pub(crate) uid_bytes: UidBytes,
-    pub(crate) P: RistrettoPoint,
-    pub(crate) plaintext_key_half: ProfileKeyHalfBytes,
+    pub(crate) profile_key_bytes: ProfileKeyBytes,
 }

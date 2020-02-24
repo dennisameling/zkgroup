@@ -6,9 +6,11 @@
 //
 
 pub mod credentials;
-pub mod profile_credential_request;
 pub mod profile_key_commitment;
+pub mod profile_key_credential_request;
 pub mod profile_key_encryption;
+pub mod profile_key_struct;
 pub mod proofs;
 pub mod signature;
 pub mod uid_encryption;
+pub mod uid_struct;

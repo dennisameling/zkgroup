@@ -11,10 +11,8 @@ use crate::api;
 use crate::common::constants::*;
 use crate::common::simple_types::*;
 use crate::crypto;
-use curve25519_dalek::ristretto::RistrettoPoint;
 use poksho::ShoSha256;
 use serde::{Deserialize, Serialize};
-use sha2::Sha256;
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct ProfileKey {
@@ -43,12 +41,9 @@ impl ProfileKey {
     }
 
     pub fn get_commitment(&self) -> api::profiles::ProfileKeyCommitment {
-        let mut bytes: ProfileKeyHalfBytes = Default::default();
-        bytes.copy_from_slice(&self.bytes[0..16]);
-        let P = RistrettoPoint::lizard_encode::<Sha256>(&bytes).unwrap();
-        let commitment =
-            crypto::profile_key_commitment::CommitmentWithSecretNonce::new(P).get_commitment();
-        return api::profiles::ProfileKeyCommitment { commitment };
+        let profile_key = crypto::profile_key_struct::ProfileKeyStruct::new(self.bytes);
+        let commitment = crypto::profile_key_commitment::Commitment::new(profile_key);
+        api::profiles::ProfileKeyCommitment { commitment }
     }
 
     pub fn get_profile_key_version(&self) -> api::profiles::ProfileKeyVersion {

@@ -12,7 +12,6 @@ use poksho::ShoSha256;
 pub type GroupMasterKeyBytes = [u8; GROUP_MASTER_KEY_LEN];
 pub type UidBytes = [u8; UUID_LEN];
 pub type ProfileKeyBytes = [u8; PROFILE_KEY_LEN];
-pub type ProfileKeyHalfBytes = [u8; PROFILE_KEY_HALF_LEN];
 pub type RandomnessBytes = [u8; RANDOMNESS_LEN];
 pub type SignatureBytes = [u8; SIGNATURE_LEN];
 pub type ChangeSignatureBytes = [u8; SIGNATURE_LEN];

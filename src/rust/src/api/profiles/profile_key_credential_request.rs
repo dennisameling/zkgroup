@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct ProfileKeyCredentialRequest {
-    pub(crate) public_key: crypto::profile_credential_request::PublicKey,
-    pub(crate) ciphertext: crypto::profile_credential_request::Ciphertext,
-    pub(crate) proof: crypto::proofs::ProfileCredentialRequestProof,
+    pub(crate) public_key: crypto::profile_key_credential_request::PublicKey,
+    pub(crate) ciphertext: crypto::profile_key_credential_request::Ciphertext,
+    pub(crate) proof: crypto::proofs::ProfileKeyCredentialRequestProof,
 }

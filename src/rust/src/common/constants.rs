@@ -7,29 +7,29 @@
 
 #![allow(non_snake_case)]
 
-pub const MAX_CRED_ATTRIBUTES: usize = 5;
+pub const NUM_AUTH_CRED_ATTRIBUTES: usize = 4;
+pub const NUM_PROFILE_KEY_CRED_ATTRIBUTES: usize = 6;
 
 pub const GROUP_MASTER_KEY_LEN: usize = 32;
-pub const GROUP_SECRET_PARAMS_LEN: usize = 320;
+pub const GROUP_SECRET_PARAMS_LEN: usize = 384;
 pub const GROUP_PUBLIC_PARAMS_LEN: usize = 128;
 pub const GROUP_IDENTIFIER_LEN: usize = 32;
-pub const AUTH_CREDENTIAL_LEN: usize = 372;
+pub const AUTH_CREDENTIAL_LEN: usize = 404;
 pub const AUTH_CREDENTIAL_PRESENTATION_LEN: usize = 620;
 pub const AUTH_CREDENTIAL_RESPONSE_LEN: usize = 392;
 pub const CLIENT_CREDENTIAL_MANAGER_LEN: usize = 256;
-pub const PROFILE_KEY_HALF_LEN: usize = 16;
-pub const PROFILE_KEY_LEN: usize = 32;
+pub const PROFILE_KEY_LEN: usize = 16;
 pub const PROFILE_KEY_CIPHERTEXT_LEN: usize = 64;
-pub const PROFILE_KEY_COMMITMENT_LEN: usize = 64;
-pub const PROFILE_KEY_CREDENTIAL_LEN: usize = 160;
-pub const PROFILE_KEY_CREDENTIAL_PRESENTATION_LEN: usize = 760;
-pub const PROFILE_KEY_CREDENTIAL_REQUEST_LEN: usize = 232;
-pub const PROFILE_KEY_CREDENTIAL_REQUEST_CONTEXT_LEN: usize = 360;
-pub const PROFILE_KEY_CREDENTIAL_RESPONSE_LEN: usize = 488;
+pub const PROFILE_KEY_COMMITMENT_LEN: usize = 96;
+pub const PROFILE_KEY_CREDENTIAL_LEN: usize = 128;
+pub const PROFILE_KEY_CREDENTIAL_PRESENTATION_LEN: usize = 936;
+pub const PROFILE_KEY_CREDENTIAL_REQUEST_LEN: usize = 424;
+pub const PROFILE_KEY_CREDENTIAL_REQUEST_CONTEXT_LEN: usize = 584;
+pub const PROFILE_KEY_CREDENTIAL_RESPONSE_LEN: usize = 520;
 pub const PROFILE_KEY_VERSION_LEN: usize = 32;
 pub const PROFILE_KEY_VERSION_ENCODED_LEN: usize = 64;
-pub const SERVER_SECRET_PARAMS_LEN: usize = 608;
-pub const SERVER_PUBLIC_PARAMS_LEN: usize = 256;
+pub const SERVER_SECRET_PARAMS_LEN: usize = 896;
+pub const SERVER_PUBLIC_PARAMS_LEN: usize = 160;
 pub const UUID_CIPHERTEXT_LEN: usize = 64;
 pub const RANDOMNESS_LEN: usize = 32;
 pub const SIGNATURE_LEN: usize = 64;

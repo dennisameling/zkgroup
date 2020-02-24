@@ -9,14 +9,11 @@
 
 use crate::api;
 use crate::common::constants::*;
-use crate::common::errors::ZkGroupError::*;
 use crate::common::errors::*;
 use crate::common::simple_types::*;
 use crate::crypto;
-use curve25519_dalek::ristretto::RistrettoPoint;
 use poksho::ShoSha256;
 use serde::{Deserialize, Serialize};
-use sha2::Sha256;
 
 #[derive(Copy, Clone, Serialize, Deserialize, Default)]
 pub struct GroupMasterKey {
@@ -112,8 +109,15 @@ impl GroupSecretParams {
     }
 
     pub fn encrypt_uuid(&self, uid_bytes: UidBytes) -> api::groups::UuidCiphertext {
-        let uid_struct = crypto::uid_encryption::UidStruct::new(uid_bytes);
-        let ciphertext = self.uid_enc_key_pair.encrypt(uid_struct);
+        let uid = crypto::uid_struct::UidStruct::new(uid_bytes);
+        self.encrypt_uid_struct(uid)
+    }
+
+    pub fn encrypt_uid_struct(
+        &self,
+        uid: crypto::uid_struct::UidStruct,
+    ) -> api::groups::UuidCiphertext {
+        let ciphertext = self.uid_enc_key_pair.encrypt(uid);
         api::groups::UuidCiphertext { ciphertext }
     }
 
@@ -121,8 +125,8 @@ impl GroupSecretParams {
         &self,
         ciphertext: api::groups::UuidCiphertext,
     ) -> Result<UidBytes, ZkGroupError> {
-        let uid_struct = self.uid_enc_key_pair.decrypt(ciphertext.ciphertext)?;
-        Ok(uid_struct.to_bytes())
+        let uid = self.uid_enc_key_pair.decrypt(ciphertext.ciphertext)?;
+        Ok(uid.to_bytes())
     }
 
     pub fn encrypt_profile_key(
@@ -130,45 +134,29 @@ impl GroupSecretParams {
         randomness: RandomnessBytes,
         profile_key: api::profiles::ProfileKey,
     ) -> api::groups::ProfileKeyCiphertext {
-        let mut bytes: ProfileKeyHalfBytes = Default::default();
-        bytes.copy_from_slice(&profile_key.bytes[0..16]);
-        let P = RistrettoPoint::lizard_encode::<Sha256>(&bytes).unwrap();
-        let mut plaintext_key_half: ProfileKeyHalfBytes = Default::default();
-        plaintext_key_half.copy_from_slice(&profile_key.bytes[16..32]);
-        let ciphertext = self.profile_key_enc_key_pair.encrypt(P, randomness);
-        api::groups::ProfileKeyCiphertext {
-            ciphertext,
-            plaintext_key_half,
-        }
+        self.encrypt_profile_key_bytes(randomness, profile_key.bytes)
     }
 
-    pub fn encrypt_profile_key_point(
+    pub fn encrypt_profile_key_bytes(
         &self,
-        randomness: RandomnessBytes,
-        P: RistrettoPoint,
-        plaintext_key_half: ProfileKeyHalfBytes,
+        _randomness: RandomnessBytes,
+        profile_key_bytes: ProfileKeyBytes,
     ) -> api::groups::ProfileKeyCiphertext {
-        let ciphertext = self.profile_key_enc_key_pair.encrypt(P, randomness);
-        api::groups::ProfileKeyCiphertext {
-            ciphertext,
-            plaintext_key_half,
-        }
+        let profile_key = crypto::profile_key_struct::ProfileKeyStruct::new(profile_key_bytes);
+        let ciphertext = self.profile_key_enc_key_pair.encrypt(profile_key);
+        api::groups::ProfileKeyCiphertext { ciphertext }
     }
 
     pub fn decrypt_profile_key(
         &self,
         ciphertext: api::groups::ProfileKeyCiphertext,
     ) -> Result<api::profiles::ProfileKey, ZkGroupError> {
-        let P = self.profile_key_enc_key_pair.decrypt(ciphertext.ciphertext);
-        match P.lizard_decode::<Sha256>() {
-            None => Err(PointDecodeFailure),
-            Some(profile_key_bytes) => {
-                let mut bytes: ProfileKeyBytes = Default::default();
-                bytes[0..16].copy_from_slice(&profile_key_bytes[..]);
-                bytes[16..32].copy_from_slice(&ciphertext.plaintext_key_half[..]);
-                Ok(api::profiles::ProfileKey { bytes })
-            }
-        }
+        let profile_key_struct = self
+            .profile_key_enc_key_pair
+            .decrypt(ciphertext.ciphertext)?;
+        Ok(api::profiles::ProfileKey {
+            bytes: profile_key_struct.bytes,
+        })
     }
 
     pub fn encrypt_blob(&self, plaintext: &[u8]) -> Vec<u8> {

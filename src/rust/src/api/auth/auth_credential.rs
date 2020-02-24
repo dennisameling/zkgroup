@@ -16,6 +16,6 @@ use serde::{Deserialize, Serialize};
 pub struct AuthCredential {
     pub(crate) credential: crypto::credentials::AuthCredential,
     pub(crate) server_public_params: api::ServerPublicParams,
-    pub(crate) uid_bytes: UidBytes,
+    pub(crate) uid: crypto::uid_struct::UidStruct,
     pub(crate) redemption_time: RedemptionTime,
 }
