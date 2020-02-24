@@ -11,7 +11,7 @@ import ProfileKeyVersion from './ProfileKeyVersion';
 
 export default class ProfileKey extends ByteArray {
 
-  static SIZE = 32;
+  static SIZE = 16;
 
   constructor(contents: FFICompatArrayType) {
     super(contents, ProfileKey.SIZE, true);

@@ -1,8 +1,4 @@
-test
-tsconfig.json
-zkgroup
-.nvmrc
-Makefile
+node_modules
 .DS_Store
 *.tgz
 *.dylib
