@@ -70,7 +70,7 @@ public final class Native {
   public static native int groupSecretParamsDecryptUuidJNI(byte[] self, byte[] uuidCiphertext, byte[] output);
   public static native int groupSecretParamsEncryptProfileKeyDeterministicJNI(byte[] self, byte[] randomness, byte[] profileKey, byte[] output);
   public static native int groupSecretParamsDecryptProfileKeyJNI(byte[] self, byte[] profileKeyCiphertext, byte[] output);
-  public static native int groupSecretParamsEncryptBlobJNI(byte[] self, byte[] plaintext, byte[] output);
+  public static native int groupSecretParamsEncryptBlobDeterministicJNI(byte[] self, byte[] randomness, byte[] plaintext, byte[] output);
   public static native int groupSecretParamsDecryptBlobJNI(byte[] self, byte[] blobCiphertext, byte[] output);
   public static native int serverSecretParamsGenerateDeterministicJNI(byte[] randomness, byte[] output);
   public static native int serverSecretParamsGetPublicParamsJNI(byte[] self, byte[] output);

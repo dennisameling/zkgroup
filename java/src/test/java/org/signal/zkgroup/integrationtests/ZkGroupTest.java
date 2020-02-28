@@ -348,14 +348,46 @@ private static final byte[] profileKeyPresentationResult = Hex.fromStringCondens
   }
 
   @Test
-  public void testBlobEncryption() throws VerificationFailedException {
-    GroupSecretParams groupSecretParams = GroupSecretParams.generate();
+  public void testBlobEncryption() throws InvalidInputException, VerificationFailedException {
+
+      /*
+    let master_key = zkgroup::groups::GroupMasterKey::new(zkgroup::TEST_ARRAY_32_1);
+    let group_secret_params =
+        zkgroup::groups::GroupSecretParams::derive_from_master_key(master_key);
+    let randomness = zkgroup::TEST_ARRAY_32_2;
+
+    let plaintext_vec = vec![
+        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+        0x18, 0x19,
+    ];
+
+    let ciphertext_vec = vec![
+        0xc0, 0x9c, 0x16, 0x75, 0x4b, 0x32, 0x86, 0x7f, 0xd5, 0x11, 0x9d, 0x18, 0x81, 0xd6, 0x2e,
+        0x7c, 0x96, 0x7f, 0x6e, 0x3a, 0x8a, 0xf5, 0xf0, 0x9a, 0xc8, 0x4f, 0x7b, 0x74, 0xfc, 0xc6,
+        0xd0, 0xe4, 0xd5, 0x9c, 0x9f, 0x4a, 0x17, 0x5e, 0x0f, 0x48, 0x9c, 0x47, 0xe4, 0x81, 0xf1,
+    ];
+
+    let calc_ciphertext_vec = group_secret_params
+        .encrypt_blob(randomness, &plaintext_vec)
+        .unwrap();
+    let calc_plaintext_vec = group_secret_params
+        .decrypt_blob(&calc_ciphertext_vec)
+        .unwrap();
+    assert!(calc_plaintext_vec == plaintext_vec);
+    assert!(calc_ciphertext_vec == ciphertext_vec);
+    */
+
+    GroupMasterKey    masterKey         = new GroupMasterKey(TEST_ARRAY_32_1);
+    GroupSecretParams groupSecretParams = GroupSecretParams.deriveFromMasterKey(masterKey);
     ClientZkGroupCipher clientZkGroupCipher = new ClientZkGroupCipher(groupSecretParams);
 
-    byte[] plaintext = {0,1,2,3,4};
-    byte[] ciphertext = clientZkGroupCipher.encryptBlob(plaintext);
+    byte[] plaintext = Hex.fromStringCondensedAssert("0102030405060708111213141516171819");
+    byte[] ciphertext = Hex.fromStringCondensedAssert("c09c16754b32867fd5119d1881d62e7c967f6e3a8af5f09ac84f7b74fcc6d0e4d59c9f4a175e0f489c47e481f1");
+
+    byte[] ciphertext2 = clientZkGroupCipher.encryptBlob(createSecureRandom(TEST_ARRAY_32_2), plaintext);
     byte[] plaintext2 = clientZkGroupCipher.decryptBlob(ciphertext);
     assertArrayEquals(plaintext, plaintext2);
+    assertArrayEquals(ciphertext, ciphertext2);
   }
 
   private void assertByteArray(String expectedAsHex, byte[] actual) {

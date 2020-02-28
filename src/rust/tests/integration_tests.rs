@@ -211,8 +211,6 @@ fn test_integration_profile() {
     // Random UID and issueTime
     let uid = zkgroup::TEST_ARRAY_16;
 
-    println!("PROFILE A");
-
     // SERVER
     let server_secret_params = zkgroup::ServerSecretParams::generate(zkgroup::TEST_ARRAY_32);
     let server_public_params = server_secret_params.get_public_params();
@@ -223,16 +221,12 @@ fn test_integration_profile() {
         zkgroup::groups::GroupSecretParams::derive_from_master_key(master_key);
     let group_public_params = group_secret_params.get_public_params();
 
-    println!("PROFILE B");
-
     let profile_key =
         zkgroup::profiles::ProfileKey::create(zkgroup::common::constants::TEST_ARRAY_16);
     let profile_key_commitment = profile_key.get_commitment();
 
     // Create context and request
     let randomness = zkgroup::TEST_ARRAY_32_3;
-
-    println!("PROFILE B.1");
 
     let context = server_public_params.create_profile_key_credential_request_context(
         randomness,
@@ -241,8 +235,6 @@ fn test_integration_profile() {
     );
     let request = context.get_request();
 
-    println!("PROFILE C");
-
     // SERVER
 
     let randomness = zkgroup::TEST_ARRAY_32_4;
@@ -250,30 +242,22 @@ fn test_integration_profile() {
         .issue_profile_key_credential(randomness, &request, uid, profile_key_commitment)
         .unwrap();
 
-    println!("PROFILE C.1");
-
     // CLIENT
     // Gets stored profile credential
     let profile_key_credential = server_public_params
         .receive_profile_key_credential(&context, &response)
         .unwrap();
 
-    println!("PROFILE D");
-
     // Create encrypted UID and profile key
     let uuid_ciphertext = group_secret_params.encrypt_uuid(uid);
     let plaintext = group_secret_params.decrypt_uuid(uuid_ciphertext).unwrap();
     assert!(plaintext == uid);
-
-    println!("PROFILE E");
 
     let profile_key_ciphertext = group_secret_params.encrypt_profile_key(randomness, profile_key);
     let decrypted_profile_key = group_secret_params
         .decrypt_profile_key(profile_key_ciphertext)
         .unwrap();
     assert!(decrypted_profile_key.get_bytes() == profile_key.get_bytes());
-
-    println!("PROFILE F");
 
     // Create presentation
     let randomness = zkgroup::TEST_ARRAY_32_5;
@@ -284,12 +268,10 @@ fn test_integration_profile() {
         profile_key_credential,
     );
 
-    println!("PROFILE G");
-
     let presentation_bytes = &bincode::serialize(&presentation).unwrap();
-    for b in presentation_bytes.iter() {
-        print!("0x{:02x}, ", b);
-    }
+    //for b in presentation_bytes.iter() {
+    //    print!("0x{:02x}, ", b);
+    //}
     assert!(PROFILE_KEY_CREDENTIAL_PRESENTATION_RESULT[..] == presentation_bytes[..]);
 
     // SERVER
@@ -372,4 +354,35 @@ fn test_server_sigs() {
     server_public_params
         .verify_signature(&message, change_signature)
         .unwrap();
+}
+
+#[test]
+fn test_blob_encryption() {
+    let master_key = zkgroup::groups::GroupMasterKey::new(zkgroup::TEST_ARRAY_32_1);
+    let group_secret_params =
+        zkgroup::groups::GroupSecretParams::derive_from_master_key(master_key);
+    let randomness = zkgroup::TEST_ARRAY_32_2;
+
+    let plaintext_vec = vec![
+        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+        0x18, 0x19,
+    ];
+
+    let ciphertext_vec = vec![
+        0xc0, 0x9c, 0x16, 0x75, 0x4b, 0x32, 0x86, 0x7f, 0xd5, 0x11, 0x9d, 0x18, 0x81, 0xd6, 0x2e,
+        0x7c, 0x96, 0x7f, 0x6e, 0x3a, 0x8a, 0xf5, 0xf0, 0x9a, 0xc8, 0x4f, 0x7b, 0x74, 0xfc, 0xc6,
+        0xd0, 0xe4, 0xd5, 0x9c, 0x9f, 0x4a, 0x17, 0x5e, 0x0f, 0x48, 0x9c, 0x47, 0xe4, 0x81, 0xf1,
+    ];
+
+    let calc_ciphertext_vec = group_secret_params
+        .encrypt_blob(randomness, &plaintext_vec)
+        .unwrap();
+    let calc_plaintext_vec = group_secret_params
+        .decrypt_blob(&calc_ciphertext_vec)
+        .unwrap();
+    assert!(calc_plaintext_vec == plaintext_vec);
+    assert!(calc_ciphertext_vec == ciphertext_vec);
+    //for b in calc_ciphertext_vec.iter() {
+    //    print!("0x{:02x}, ", b);
+    //}
 }

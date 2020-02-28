@@ -144,7 +144,7 @@ mod tests {
         assert!(ciphertext_bytes.len() == 64);
         let ciphertext2: Ciphertext = bincode::deserialize(&ciphertext_bytes).unwrap();
         assert!(ciphertext == ciphertext2);
-        println!("ciphertext_bytes = {:#x?}", ciphertext_bytes);
+        //println!("ciphertext_bytes = {:#x?}", ciphertext_bytes);
         assert!(
             ciphertext_bytes
                 == vec![

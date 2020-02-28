@@ -373,7 +373,7 @@ mod tests {
 
         let mac_bytes = bincode::serialize(&credential).unwrap();
 
-        println!("mac_bytes = {:#x?}", mac_bytes);
+        //println!("mac_bytes = {:#x?}", mac_bytes);
         assert!(
             mac_bytes
                 == vec![

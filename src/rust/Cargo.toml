@@ -24,6 +24,8 @@ sha2 = "0.8.0"
 poksho = { git = "ssh://git@github.com/signalapp/poksho.git", tag = "v0.3.0" }
 jni = { version = "0.12.3", default-features = false }
 hex = "0.4.0"
+aead = "0.2.0"
+aes-gcm-siv = "0.3.0"
 
 [dependencies.curve25519-dalek]
 features = ["serde", "alloc"]

@@ -167,14 +167,17 @@ def define_classes():
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     };""")
 
-    c.add_method("encrypt_blob", "byte[]", "blob_ciphertext", [("byte[]", "plaintext")], 
-            """    let blob_ciphertext = group_secret_params.encrypt_blob(plaintext);""", runtime_error=True, return_size_increment=+0)
+    c.add_method("encrypt_blob_deterministic", "byte[]", "blob_ciphertext", [("class", "randomness"), ("byte[]", "plaintext")],
+             """    let blob_ciphertext = match group_secret_params.encrypt_blob(randomness, plaintext) {
+         Ok(result) => result,
+         Err(_) => return FFI_RETURN_INPUT_ERROR,
+     };""", return_size_increment=+28)
 
     c.add_method("decrypt_blob", "byte[]", "plaintext", [("byte[]", "blob_ciphertext")], 
             """    let plaintext = match group_secret_params.decrypt_blob(blob_ciphertext) {
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
-    };""", return_size_increment=-0)
+    };""", return_size_increment=-28)
 
     classes.append(c)
 

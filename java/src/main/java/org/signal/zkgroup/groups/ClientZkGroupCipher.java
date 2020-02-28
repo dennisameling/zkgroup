@@ -102,10 +102,20 @@ public class ClientZkGroupCipher {
 
   }
 
-  public byte[] encryptBlob(byte[] plaintext) {
-    byte[] newContents = new byte[plaintext.length+0];
+  public byte[] encryptBlob(byte[] plaintext) throws VerificationFailedException {
+    return encryptBlob(new SecureRandom(), plaintext);
+  }
 
-    int ffi_return = Native.groupSecretParamsEncryptBlobJNI(groupSecretParams.getInternalContentsForJNI(), plaintext, newContents);
+  public byte[] encryptBlob(SecureRandom secureRandom, byte[] plaintext) throws VerificationFailedException {
+    byte[] newContents = new byte[plaintext.length+28];
+    byte[] random      = new byte[Native.RANDOM_LENGTH];
+
+    secureRandom.nextBytes(random);
+
+    int ffi_return = Native.groupSecretParamsEncryptBlobDeterministicJNI(groupSecretParams.getInternalContentsForJNI(), random, plaintext, newContents);
+    if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
+      throw new VerificationFailedException();
+    }
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw new ZkGroupError("FFI_RETURN!=OK");
@@ -115,7 +125,7 @@ public class ClientZkGroupCipher {
   }
 
   public byte[] decryptBlob(byte[] blobCiphertext) throws VerificationFailedException {
-    byte[] newContents = new byte[blobCiphertext.length+0];
+    byte[] newContents = new byte[blobCiphertext.length-28];
 
     int ffi_return = Native.groupSecretParamsDecryptBlobJNI(groupSecretParams.getInternalContentsForJNI(), blobCiphertext, newContents);
     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {

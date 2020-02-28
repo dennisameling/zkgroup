@@ -245,8 +245,9 @@ pub fn GroupSecretParams_decryptProfileKey(
     FFI_RETURN_OK
 }
 
-pub fn GroupSecretParams_encryptBlob(
+pub fn GroupSecretParams_encryptBlobDeterministic(
     groupSecretParamsIn: &[u8],
+    randomnessIn: &[u8],
     plaintextIn: &[u8],
     blobCiphertextOut: &mut [u8],
 ) -> i32 {
@@ -255,8 +256,16 @@ pub fn GroupSecretParams_encryptBlob(
             Ok(result) => result,
             Err(_) => return FFI_RETURN_INTERNAL_ERROR,
         };
+
+    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
     let plaintext = plaintextIn;
-    let blob_ciphertext = group_secret_params.encrypt_blob(plaintext);
+    let blob_ciphertext = match group_secret_params.encrypt_blob(randomness, plaintext) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
     blobCiphertextOut.copy_from_slice(&blob_ciphertext);
     FFI_RETURN_OK
 }
