@@ -16,6 +16,7 @@ jobs:
 
       - name: Install pre-requisites
         run: |
+          sudo apt-get update && sudo apt-get install -y crossbuild-essential-arm64 crossbuild-essential-i386
           cargo install --version=1.0.0 cargo-ndk
           rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android aarch64-unknown-linux-gnu i686-unknown-linux-gnu
 
@@ -47,8 +48,8 @@ jobs:
           npm --version
           node --version
           make libzkgroup CARGO_TARGET=x86_64-unknown-linux-gnu NODE_ARCH=x64
-          docker build -t zkgroup/cross-compile docker/cross-compile
-          docker run --rm -v ${PWD}:/project zkgroup/cross-compile /bin/bash -c "cd /project/ffi/node && make libzkgroup CARGO_TARGET=aarch64-unknown-linux-gnu NODE_ARCH=arm64 && make libzkgroup CARGO_TARGET=i686-unknown-linux-gnu NODE_ARCH=ia32"
+          make libzkgroup CARGO_TARGET=aarch64-unknown-linux-gnu NODE_ARCH=arm64
+          make libzkgroup CARGO_TARGET=i686-unknown-linux-gnu NODE_ARCH=ia32
 
       - name: Upload Android
         uses: svenstaro/upload-release-action@v1-release
